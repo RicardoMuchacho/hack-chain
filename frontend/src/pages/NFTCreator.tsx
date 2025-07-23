@@ -30,9 +30,9 @@ const NFTCreator = () => {
                 handle="javicodes"
                 status="Online"
                 contactText="Contact Me"
-                avatarUrl="/path/to/avatar.jpg"
                 showUserInfo={true}
                 enableTilt={true}
+                innerGradient={""}
                 onContactClick={() => console.log('Contact clicked')}
             />
           {/* <div className="bg-white/10 border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-md">
@@ -57,7 +57,7 @@ const NFTCreator = () => {
         </section>
         {/* Form */}
         <section className="w-full md:w-1/2 flex justify-center">
-          <form className="bg-white/10 border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-md space-y-5">
+          <form className="bg-gray-900 border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-md space-y-5">
             <div>
               <Label htmlFor="studentName">Student Name</Label>
               <Input

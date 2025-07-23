@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import "./ProfileCard.css";
 
 interface ProfileCardProps {
-  avatarUrl: string;
   iconUrl?: string;
   grainUrl?: string;
   behindGradient?: string;
@@ -10,7 +9,6 @@ interface ProfileCardProps {
   showBehindGradient?: boolean;
   className?: string;
   enableTilt?: boolean;
-  miniAvatarUrl?: string;
   name?: string;
   title?: string;
   handle?: string;
@@ -52,7 +50,6 @@ const easeInOutCubic = (x: number): number =>
   x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 
 const ProfileCardComponent: React.FC<ProfileCardProps> = ({
-  avatarUrl = "<Placeholder for avatar URL>",
   iconUrl = "<Placeholder for icon URL>",
   grainUrl = "<Placeholder for grain URL>",
   behindGradient,
@@ -60,7 +57,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   showBehindGradient = true,
   className = "",
   enableTilt = true,
-  miniAvatarUrl,
   name = "Javi A. Torres",
   title = "Software Engineer",
   handle = "javicodes",
@@ -269,31 +265,9 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
           <div className="pc-shine" />
           <div className="pc-glare" />
           <div className="pc-content pc-avatar-content">
-            <img
-              className="avatar"
-              src={avatarUrl}
-              alt={`${name || "User"} avatar`}
-              loading="lazy"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-              }}
-            />
             {showUserInfo && (
               <div className="pc-user-info">
                 <div className="pc-user-details">
-                  <div className="pc-mini-avatar">
-                    <img
-                      src={miniAvatarUrl || avatarUrl}
-                      alt={`${name || "User"} mini avatar`}
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.opacity = "0.5";
-                        target.src = avatarUrl;
-                      }}
-                    />
-                  </div>
                   <div className="pc-user-text">
                     <div className="pc-handle">@{handle}</div>
                     <div className="pc-status">{status}</div>
