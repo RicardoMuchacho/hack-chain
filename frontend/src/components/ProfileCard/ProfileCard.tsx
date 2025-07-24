@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import "./ProfileCard.css";
 import { Award } from "lucide-react";
+import placeholderLogo from "../../../public/images/placeholderLogo.png";
+import hackChainLogo from "../../../public/images/logoHackChain.png";
+import sealLogo from "../../../public/images/certificateSeal.png";
 
 interface ProfileCardProps {
   iconUrl?: string;
@@ -262,17 +265,20 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
           <div className="pc-content">
           <div className="pc-details">
               {/* Header Section */}
-              <div className="flex h-full justify-between px-10">
-                <div className="flex flex-col gap-1">
+              <div className="flex justify-between px-10 items-start">
+                <div className="flex flex-col gap-2 max-w-[80%]">
                   <p className="text-sm text-gray-400">{certificateType}</p>
-                  <h3 className="text-left text-lg font-semibold">{title}</h3>
+                  <h3 className="text-2xl font-semibold line-clamp-2 break-words">
+                    {title}
+                  </h3>
                 </div>
-                <div>
-                  <Award size={"48px"} color="gray"/>
+                <div className="">
+                  {/* <Award size={"48px"} color="gray"/> */}
+                  <img src={sealLogo} alt="Seal" className="w-16 h-16 border-radius-full" />
                 </div>
               </div>
-              <hr className="mx-10 my-6"/>     
-            <div className="flex flex-col gap-4 px-4">
+              <hr className="mx-10 mt-4"/>     
+            <div className="flex flex-col gap-2 p-6">
               {/* First Row: Awarded To and Issue Date */}
               <div className="flex justify-between">
                 <div className="pc-section w-1/2 pr-2">
@@ -285,18 +291,26 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                 </div>
               </div>
               {/* Second Row: Issuer and Logo */}
-              <div className="flex justify-between items-center pt-4">
+              <div className="flex justify-between items-center pt-2">
                 <div className="pc-section w-1/2 pr-2">
                   <p className="text-sm text-gray-400">Issued By</p>
                   <p className="pc-details-large">{issuer}</p>
                 </div>
-                {logoUrl && (
+                {logoUrl ? (
                   <div className="w-1/2 pl-2 flex justify-start">
-                    <img 
+                      <img 
                       src={logoUrl} 
                       alt="Issuer Logo" 
                       className="h-20 w-auto object-contain max-w-full"
-                    />
+                      />
+                  </div>
+                ) : (
+                  <div className="w-1/2 pl-2 flex justify-start">
+                      <img 
+                      src={hackChainLogo} 
+                      alt="Default Logo" 
+                      className="h-20 w-auto object-contain max-w-full"
+                      />
                   </div>
                 )}
               </div>

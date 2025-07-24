@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Wallet, Menu, X } from 'lucide-react';
+import hackChainLogo from "../../public/images/logoHackChain.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,10 +19,15 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="gradient-text text-2xl font-bold">
-              HackChain
-            </div>
+          <img 
+            src={hackChainLogo} 
+            alt="HackChain Logo" 
+            className="h-8 w-auto mr-2"
+          />
+          <div className="gradient-text text-2xl font-bold">
+            HackChain
           </div>
+        </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">

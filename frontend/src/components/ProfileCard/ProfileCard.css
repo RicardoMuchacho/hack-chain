@@ -178,23 +178,15 @@
 
 .pc-content {
   max-height: 100%;
-  overflow: hidden;
   text-align: center;
   position: relative;
   transform: translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 0.1px) !important;
   z-index: 5;
-  mix-blend-mode: luminosity;
-}
-
-/* Ensure logo maintains its original colors */
-.pc-content img {
-  mix-blend-mode: normal !important;
-  filter: none !important;
 }
 
 .pc-details {
   width: 100%;
-  position: absolute;
+  position: relative;
   top: 2em;
   display: flex;
   flex-direction: column;
@@ -211,6 +203,8 @@
 }
 
 .pc-details h3 {
+  margin-top: 0px;
+  padding-top: 0px;
   font-weight: 600;
   font-size: min(5svh, 3em);
   background-image: linear-gradient(to bottom, #fff, #6f6fbe);
@@ -218,6 +212,8 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
+  text-align: left;
+  border-radius: 0px;
 }
 
 .pc-details p {
@@ -231,6 +227,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
+  border-radius: 0px;
 }
 
 .pc-details p.pc-details-large {

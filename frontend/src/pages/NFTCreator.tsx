@@ -11,7 +11,7 @@ const NFTCreator = () => {
     certificateType: '',
     certificateTitle: '',
     issuer: '',
-    issueDate: '',
+    issueDate: new Date().toISOString().split('T')[0],
     logo: '',
   });
   const [logoPreview, setLogoPreview] = useState('');
@@ -33,7 +33,7 @@ const NFTCreator = () => {
   return (
     <Layout>
       <Navbar />
-      <main className="flex flex-col md:flex-row items-center justify-center min-h-[80vh] px-12 pt-16 my-8">
+      <main className="min-h-screen flex flex-col md:flex-row items-center justify-center px-12 pt-8">
         {/* NFT Preview */}
         <section className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
             <ProfileCard
@@ -43,7 +43,6 @@ const NFTCreator = () => {
                 issuer={form.issuer || 'Issuer Name'}
                 issueDate={form.issueDate || 'Issue Date'}
                 logoUrl={form.logo || ''}
-
                 enableTilt={true}
                 innerGradient={""}
             />
@@ -86,17 +85,6 @@ const NFTCreator = () => {
                 autoComplete="off"
                 className="mt-1"
               />
-            </div>
-            <div>
-              <Label htmlFor="issueDate">Date</Label>
-              <Input
-                id="issueDate"
-                name="issueDate"
-                type="date"
-                value={form.issueDate}
-                onChange={handleChange}
-                className="mt-1"
-            />
             </div>
             <div>
               <Label htmlFor="logo">Issuer Logo (Optional)</Label>
