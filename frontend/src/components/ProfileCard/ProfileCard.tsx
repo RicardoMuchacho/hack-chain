@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import "./ProfileCard.css";
+import { Award } from "lucide-react";
 
 interface ProfileCardProps {
   iconUrl?: string;
@@ -11,11 +12,10 @@ interface ProfileCardProps {
   enableTilt?: boolean;
   name?: string;
   title?: string;
-  handle?: string;
-  status?: string;
-  contactText?: string;
-  showUserInfo?: boolean;
-  onContactClick?: () => void;
+  certificateType?: string;
+  issuer?: string;
+  issueDate?: string;
+  logoUrl?: string;
 }
 
 const DEFAULT_BEHIND_GRADIENT =
@@ -59,11 +59,10 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   enableTilt = true,
   name = "Javi A. Torres",
   title = "Software Engineer",
-  handle = "javicodes",
-  status = "Online",
-  contactText = "Contact",
-  showUserInfo = true,
-  onContactClick,
+  certificateType = "Certificate of Completion",
+  issuer = "Issuer Name",
+  issueDate = "Issue Date",
+  logoUrl,
 }) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -250,10 +249,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     [iconUrl, grainUrl, showBehindGradient, behindGradient, innerGradient]
   );
 
-  const handleContactClick = useCallback(() => {
-    onContactClick?.();
-  }, [onContactClick]);
-
   return (
     <div
       ref={wrapRef}
@@ -261,37 +256,54 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
       style={cardStyle}
     >
       <section ref={cardRef} className="pc-card">
-        <div className="pc-inside">
+      <div className="pc-inside">
           <div className="pc-shine" />
           <div className="pc-glare" />
-          <div className="pc-content pc-avatar-content">
-            {showUserInfo && (
-              <div className="pc-user-info">
-                <div className="pc-user-details">
-                  <div className="pc-user-text">
-                    <div className="pc-handle">@{handle}</div>
-                    <div className="pc-status">{status}</div>
-                  </div>
-                </div>
-                <button
-                  className="pc-contact-btn"
-                  onClick={handleContactClick}
-                  style={{ pointerEvents: "auto" }}
-                  type="button"
-                  aria-label={`Contact ${name || "user"}`}
-                >
-                  {contactText}
-                </button>
-              </div>
-            )}
-          </div>
           <div className="pc-content">
-            <div className="pc-details">
-              <h3>{name}</h3>
-              <p>{title}</p>
+          <div className="pc-details">
+              {/* Header Section */}
+              <div className="flex h-full justify-between px-10">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-gray-400">{certificateType}</p>
+                  <h3 className="text-left text-lg font-semibold">{title}</h3>
+                </div>
+                <div>
+                  <Award size={"48px"} color="gray"/>
+                </div>
+              </div>
+              <hr className="mx-10 my-6"/>     
+            <div className="flex flex-col gap-4 px-4">
+              {/* First Row: Awarded To and Issue Date */}
+              <div className="flex justify-between">
+                <div className="pc-section w-1/2 pr-2">
+                  <p className="text-sm text-gray-400">Awarded To</p>
+                  <p className="pc-details-large">{name}</p>
+                </div>
+                <div className="pc-section w-1/2 pl-2">
+                  <p className="text-sm text-gray-400">Issue Date</p>
+                  <p className="pc-details-large">{issueDate}</p>
+                </div>
+              </div>
+              {/* Second Row: Issuer and Logo */}
+              <div className="flex justify-between items-center pt-4">
+                <div className="pc-section w-1/2 pr-2">
+                  <p className="text-sm text-gray-400">Issued By</p>
+                  <p className="pc-details-large">{issuer}</p>
+                </div>
+                {logoUrl && (
+                  <div className="w-1/2 pl-2 flex justify-start">
+                    <img 
+                      src={logoUrl} 
+                      alt="Issuer Logo" 
+                      className="h-20 w-auto object-contain max-w-full"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+          </div>
+      </div>
       </section>
     </div>
   );

@@ -8,14 +8,26 @@ import ProfileCard from '@/components/ProfileCard/ProfileCard';
 
 const NFTCreator = () => {
   const [form, setForm] = useState({
-    studentName: '',
+    certificateType: '',
     certificateTitle: '',
-    educator: '',
-    date: '',
+    issuer: '',
+    issueDate: '',
+    logo: '',
   });
+  const [logoPreview, setLogoPreview] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === 'logo' && e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setForm({ ...form, logo: URL.createObjectURL(file) });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   return (
@@ -25,40 +37,21 @@ const NFTCreator = () => {
         {/* NFT Preview */}
         <section className="w-full md:w-1/2 flex justify-center mb-8 md:mb-0">
             <ProfileCard
-                name={form.certificateTitle || 'Certificate Title'}
-                title={form.studentName || 'Student Name'}
-                handle="javicodes"
-                status="Online"
-                contactText="Contact Me"
-                showUserInfo={true}
+                certificateType={form.certificateType || "Certificate of Completion"}
+                name={'Student Name'}
+                title={form.certificateTitle || 'Certificate Title'}
+                issuer={form.issuer || 'Issuer Name'}
+                issueDate={form.issueDate || 'Issue Date'}
+                logoUrl={form.logo || ''}
+
                 enableTilt={true}
                 innerGradient={""}
-                onContactClick={() => console.log('Contact clicked')}
             />
-          {/* <div className="bg-white/10 border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-md">
-            <div className="text-center mb-4">
-              <span className="text-lg font-semibold gradient-text">NFT Certificate Preview</span>
-            </div>
-            <div className="bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-lg p-6 min-h-[260px] flex flex-col justify-center items-center">
-              <div className="text-2xl font-bold mb-2 text-foreground">
-                {form.certificateTitle || 'Certificate Title'}
-              </div>
-              <div className="text-lg mb-2 text-foreground/80">
-                Awarded to <span className="font-semibold">{form.studentName || 'Student Name'}</span>
-              </div>
-              <div className="mb-2 text-foreground/70">
-                By <span className="font-medium">{form.educator || 'Educator'}</span>
-              </div>
-              <div className="text-sm text-foreground/60">
-                Date: {form.date || 'YYYY-MM-DD'}
-              </div>
-            </div>
-          </div> */}
         </section>
         {/* Form */}
         <section className="w-full md:w-1/2 flex justify-center">
           <form className="bg-gray-900 border border-white/20 rounded-xl shadow-lg p-6 w-full max-w-md space-y-5">
-            <div>
+            {/* <div>
               <Label htmlFor="studentName">Student Name</Label>
               <Input
                 id="studentName"
@@ -69,7 +62,7 @@ const NFTCreator = () => {
                 autoComplete="off"
                 className="mt-1"
               />
-            </div>
+            </div> */}
             <div>
               <Label htmlFor="certificateTitle">Certificate Title</Label>
               <Input
@@ -83,27 +76,48 @@ const NFTCreator = () => {
               />
             </div>
             <div>
-              <Label htmlFor="educator">Educator</Label>
+              <Label htmlFor="issuer">Issuer</Label>
               <Input
-                id="educator"
-                name="educator"
-                value={form.educator}
+                id="issuer"
+                name="issuer"
+                value={form.issuer}
                 onChange={handleChange}
-                placeholder="Enter educator name"
+                placeholder="Enter issuer name"
                 autoComplete="off"
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="issueDate">Date</Label>
               <Input
-                id="date"
-                name="date"
+                id="issueDate"
+                name="issueDate"
                 type="date"
-                value={form.date}
+                value={form.issueDate}
+                onChange={handleChange}
+                className="mt-1"
+            />
+            </div>
+            <div>
+              <Label htmlFor="logo">Issuer Logo (Optional)</Label>
+              <Input
+                id="logo"
+                name="logo"
+                type="file"
+                accept="image/*"
                 onChange={handleChange}
                 className="mt-1"
               />
+              {logoPreview && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-400 mb-1">Logo Preview:</p>
+                  <img 
+                    src={logoPreview} 
+                    alt="Logo preview" 
+                    className="h-16 w-auto object-contain"
+                  />
+                </div>
+              )}
             </div>
             <Button type="submit" className="w-full mt-4">
               Mint NFT
