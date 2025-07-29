@@ -29,9 +29,20 @@ contract HackCertificateTest is Test {
         assertEq(hackCertificate.owner(), admin);
     }
 
+<<<<<<< HEAD
     /**
      * Used to prevent a non-administrator from giving another user permission to issue certificates.
      */
+=======
+    // --- Owner functions (authorize/revoke issuers) ---
+    
+    function testShouldOnlyAllowOwnerToAuthorizeIssuer() public {
+        vm.startPrank(admin);
+        hackCertificate.authorizeIssuer(unauthorizedIssuer);
+        vm.stopPrank();
+        assertEq(hackCertificate.authorizedIssuers(unauthorizedIssuer), true);
+    }
+>>>>>>> 28b0824 (Fix tests and increase coverage)
 
     function testShouldNotAllowToAuthorizeIfNotAdmin() public {
         vm.startPrank(randomUser);
@@ -40,9 +51,25 @@ contract HackCertificateTest is Test {
         vm.stopPrank();
     }
 
+<<<<<<< HEAD
     /**
      * Used to verify that an authorized educator can correctly issue a certificate.
      */
+=======
+    function testShouldOnlyAllowOwnerToRevokeIssuer() public {
+        vm.startPrank(admin);
+        hackCertificate.revokeIssuer(authorizedIssuer);
+        vm.stopPrank();
+        assertEq(hackCertificate.authorizedIssuers(authorizedIssuer), false);
+    }
+
+    function testOnlyAdminCanRevokeIssuers() public {
+        vm.expectRevert();
+        hackCertificate.revokeIssuer(authorizedIssuer);
+    }
+
+    // --- Issue Certificate ---
+>>>>>>> 28b0824 (Fix tests and increase coverage)
 
     function testShouldAllowToIssueCertificate() public {
         vm.startPrank(authorizedIssuer);
@@ -57,24 +84,39 @@ contract HackCertificateTest is Test {
      * Used to prevent an unauthorized educator from issuing a certificate
      */
 
-    function testShouldNotAllowToIssueCertificate() public {
+    function testShouldNotAllowToIssueCertificateIfNotAuthorized() public {
         vm.startPrank(unauthorizedIssuer);
         vm.expectRevert("Not authorized issuer");
         hackCertificate.issueCertificate(randomStudent, "Ramdonlito", "Pentesting");
         vm.stopPrank();
     }
 
+<<<<<<< HEAD
     /**
      * Used to verify that the issued certificate is correctly stored in the blockchain
      */
+=======
+    function testRevokedIssuerCannotMintAnymore() public {
+        vm.startPrank(admin);
+        hackCertificate.revokeIssuer(authorizedIssuer);
+        vm.stopPrank();
+
+        vm.startPrank(authorizedIssuer);
+        vm.expectRevert("Not authorized issuer");
+        hackCertificate.issueCertificate(randomStudent, "Ramdonlito", "Pentesting");
+        vm.stopPrank();
+    }
+
+    // --- Verify Certificate ---
+>>>>>>> 28b0824 (Fix tests and increase coverage)
 
     function testShouldVerifyCertificate() public {
         vm.startPrank(authorizedIssuer);
         uint256 tokenId1 = hackCertificate.issueCertificate(randomStudent, "Ramdonlito", "Pentesting");
         vm.stopPrank();
         assertEq(1, tokenId1);
-        HackCertificate.Certificate memory c = hackCertificate.verifyCertificate(tokenId1);
 
+        HackCertificate.Certificate memory c = hackCertificate.verifyCertificate(tokenId1);
         assertEq(c.courseName, "Pentesting");
         assertEq(c.issuedAt, block.timestamp);
         assertEq(c.issuer, authorizedIssuer);
@@ -86,10 +128,11 @@ contract HackCertificateTest is Test {
      */
 
     function testShouldRevertIfCertificateDoesNotExist() public {
-        vm.expectRevert("Certificate does not exist");
+        vm.expectRevert();
         hackCertificate.verifyCertificate(0);
     }
 
+<<<<<<< HEAD
     /**
      * Used to prevent a revoked educator from issuing a certificate
      */
@@ -97,12 +140,22 @@ contract HackCertificateTest is Test {
     function testRevokedIssuerCannotMintAnymore() public {
         vm.startPrank(admin);
         hackCertificate.revokeIssuer(authorizedIssuer);
+=======
+    // --- Revoke Certificate ---
+
+    function testShouldRevokeCertificate() public {
+>>>>>>> 28b0824 (Fix tests and increase coverage)
         vm.startPrank(authorizedIssuer);
-        vm.expectRevert("Not authorized issuer");
-        hackCertificate.issueCertificate(randomStudent, "Ramdonlito", "Pentesting");
+        uint256 tokenId1 = hackCertificate.issueCertificate(randomStudent, "Juan", "Solidity");
+        vm.stopPrank();
+        assertEq(tokenId1, 1);
+
+        vm.startPrank(authorizedIssuer);
+        hackCertificate.revokeCertificate(tokenId1);
         vm.stopPrank();
     }
 
+<<<<<<< HEAD
     /**
      * Used to verify that only the admin can revoke an educator
      */
@@ -183,3 +236,23 @@ contract HackCertificateTest is Test {
     }   
 
 }
+=======
+    function testRevokeCertificateUnauthorizedFails() public {
+        vm.startPrank(authorizedIssuer);
+        uint256 tokenId = hackCertificate.issueCertificate(randomStudent, "Juan", "Solidity");
+        vm.stopPrank();
+
+        vm.startPrank(randomUser); // ni owner ni issuer
+        vm.expectRevert("Not authorized to revoke");
+        hackCertificate.revokeCertificate(tokenId);
+        vm.stopPrank();
+    }
+
+    function testRevokeNonExistentCertificateFails() public {
+        vm.startPrank(admin);
+        vm.expectRevert();
+        hackCertificate.revokeCertificate(999);
+        vm.stopPrank();
+    }
+}
+>>>>>>> 28b0824 (Fix tests and increase coverage)

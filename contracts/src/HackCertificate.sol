@@ -10,8 +10,7 @@ import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 // Contract
 contract HackCertificate is ERC721, Ownable {
-    
-    // Variables
+    // --- State variables ---
     uint256 public currentTokenId;
 
     struct Certificate {
@@ -24,13 +23,13 @@ contract HackCertificate is ERC721, Ownable {
     mapping(uint256 => Certificate) public certificates;
     mapping(address => bool) public authorizedIssuers;
 
-    // Events
+    // --- Events ---
     event CertificateIssued(uint256 tokenId, address indexed issuer, address indexed student);
 
-    // Constructor
+    // --- Constructor ---
     constructor() ERC721("Hack Certificate", "HACKCERT") Ownable(msg.sender) {}
 
-    // Modifiers
+    // --- Modifiers ---
     modifier onlyAuthorizedIssuer() {
         require(authorizedIssuers[msg.sender], "Not authorized issuer");
         _;
@@ -92,16 +91,16 @@ contract HackCertificate is ERC721, Ownable {
         return certificates[tokenId];
     }
 
+    // --- Revocation ---
     function revokeCertificate(uint256 tokenId) external {
-        require(owner() == msg.sender || certificates[tokenId].issuer == msg.sender,
-        "Not authorized to revoke");
-        
+        require(
+            owner() == msg.sender || certificates[tokenId].issuer == msg.sender,
+            "Not authorized to revoke"
+        );
         _requireOwned(tokenId);
 
         delete certificates[tokenId];
-
         _burn(tokenId);
-
     }
 
     /**
