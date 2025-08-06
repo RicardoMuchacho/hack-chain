@@ -7,9 +7,12 @@ pragma solidity ^0.8.24;
 // Libraries
 import "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 
 // Contract
 contract HackCertificate is ERC721, Ownable {
+    using Strings for uint256;
+
     // --- State variables ---
     uint256 public currentTokenId;
 
@@ -21,6 +24,7 @@ contract HackCertificate is ERC721, Ownable {
     }
 
     mapping(uint256 => Certificate) public certificates;
+    mapping(uint256 => string) private _tokenURIs;
     mapping(address => bool) public authorizedIssuers;
 
     // --- Events ---
@@ -65,7 +69,8 @@ contract HackCertificate is ERC721, Ownable {
     function issueCertificate(
         address to,
         string memory studentName,
-        string memory courseName
+        string memory courseName,
+        string memory tokenUri
     ) external onlyAuthorizedIssuer returns (uint256) {
         uint256 newId = ++currentTokenId;
         _mint(to, newId);
@@ -76,6 +81,8 @@ contract HackCertificate is ERC721, Ownable {
             issuedAt: block.timestamp,
             issuer: msg.sender
         });
+
+        _setTokenURI(newId, tokenUri);
 
         emit CertificateIssued(newId, msg.sender, to);
         return newId;
@@ -91,6 +98,18 @@ contract HackCertificate is ERC721, Ownable {
         return certificates[tokenId];
     }
 
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+        string memory uri = _tokenURIs[tokenId];
+        return uri;
+    }
+
+    // --- Internal ---
+    function _setTokenURI(uint256 tokenId, string memory uri) internal {
+        _requireOwned(tokenId);
+        _tokenURIs[tokenId] = uri;
+    }
+
     // --- Revocation ---
     function revokeCertificate(uint256 tokenId) external {
         require(
@@ -100,6 +119,7 @@ contract HackCertificate is ERC721, Ownable {
         _requireOwned(tokenId);
 
         delete certificates[tokenId];
+        delete _tokenURIs[tokenId];
         _burn(tokenId);
     }
 
