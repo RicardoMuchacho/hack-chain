@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import "./CertificateCard.css";
 import { Award } from "lucide-react";
+import placeholderLogo from "/images/placeholderLogo.png";
 
 interface CertificateCardProps {
   iconUrl?: string;
