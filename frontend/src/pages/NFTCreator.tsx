@@ -108,7 +108,7 @@ const NFTCreator = () => {
               )}
             </div>
             <Button type="submit" className="w-full mt-4">
-              Mint NFT
+              Download Certificate
             </Button>
           </form>
         </section>
