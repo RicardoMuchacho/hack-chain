@@ -4,17 +4,14 @@ module.exports = (sequelize, DataTypes) => {
   const Student = sequelize.define("Student", {
     name: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false
     },
     lastName: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false
     },
     age: {
       type: DataTypes.INTEGER,
-      unique: true,
       allowNull: false
     },
     email: {
@@ -41,6 +38,11 @@ module.exports = (sequelize, DataTypes) => {
     const salt = await bcrypt.genSalt(10);
     student.passwordHash = await bcrypt.hash(student.passwordHash, salt);
   });
+
+  // Relate students with certificates
+  Student.associate = (models) => {
+    Student.hasMany(models.Certificate, { foreignKey: 'studentId' });
+  }
 
   return Student;
 };
