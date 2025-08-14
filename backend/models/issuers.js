@@ -32,5 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     issuer.passwordHash = await bcrypt.hash(issuer.passwordHash, salt);
   });
 
+  Issuer.associate = (models) => {
+    Issuer.hasMany(models.Certificate, { foreignKey: 'issuerId' });
+  }
+
   return Issuer;
 };

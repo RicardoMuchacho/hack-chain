@@ -8,6 +8,8 @@ const pinata = new PinataSDK({
   pinataGateway: process.env.GATEWAY_URL,
 });
 
+const { Certificate, Student, Issuer } = require("../models");
+
 const defaultCertificateCID = "bafybeibmeqeia5ta52vxbapor5mkens2uwau2xsy6oetrf6prlcfssm5le";
 
 // POST /api/certificates: Upload certificate metadata to Pinata
@@ -48,6 +50,42 @@ router.get("/:cid", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(404).json({ error: "Metadata not found" });
+  }
+});
+
+// POST /api/certificates/database
+router.post("/database", async (req, res) => {
+  try {
+    const { title, issueDate, studentId, issuerId } = req.body;
+
+    // 1. Check if student exists
+    const student = await Student.findByPk(studentId);
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // 2. Check if issuer exists
+    const issuer = await Issuer.findByPk(issuerId);
+    if (!issuer) {
+      return res.status(404).json({ error: "Issuer not found" });
+    }
+
+    // 3. Create certificate
+    const certificate = await Certificate.create({
+      title,
+      issueDate,
+      studentId,
+      issuerId
+    });
+
+    res.status(201).json({
+      message: "Certificate created successfully",
+      certificate
+    });
+
+  } catch (error) {
+    console.error("Error creating certificate:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
