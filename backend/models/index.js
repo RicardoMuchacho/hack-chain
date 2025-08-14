@@ -19,5 +19,6 @@ db.sequelize = sequelize;
 db.Student = require("./students")(sequelize, DataTypes);
 db.Issuer = require("./issuers")(sequelize, DataTypes);
 db.Recruiter = require("./recruiters")(sequelize, DataTypes);
+db.Certificate = require("./certificates")(sequelize, DataTypes);
 
 module.exports = db;
