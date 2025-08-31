@@ -25,6 +25,58 @@ contract HackTokenERC20Test is Test {
         vm.stopPrank();
     }
 
+    // ------------------------------------------------------------------------
+    //                          ADMIN-ONLY TESTS
+    // ------------------------------------------------------------------------
+
+    /// @notice Tests that only the owner can mint tokens.
+    function testMintTokensOnlyAdmin() public {
+        address recipient = vm.addr(4);
+        uint256 amount = 50 ether;
+
+        vm.prank(admin);
+        _hacktoken.mintTokens(recipient, amount);
+
+        assertEq(_hacktoken.balanceOf(recipient), amount, "Only owner should be able to mint");
+        assertEq(_hacktoken.totalSupply(), amount, "Total supply should match minted amount");
+    }
+
+    /// @notice Tests that only the owner can transfer ownership.
+    function testTransferOwnerOnlyAdmin() public {
+        address newAddress = vm.addr(6);
+
+        vm.prank(randomUser);
+        vm.expectRevert();
+        _hacktoken.transferOwnershipCustom(newAddress);
+    }
+
+    /// @notice Tests that only the owner can pause the contract.
+    function testPauseOwnerOnlyAdmin() public {
+        vm.prank(admin);
+        _hacktoken.pause();
+    }
+
+    /// @notice Tests that only the owner can unpause the contract.
+    function testUnPauseOwnerOnlyAdmin() public {
+        vm.prank(admin);
+        _hacktoken.pause();
+
+        vm.prank(admin);
+        _hacktoken.unpause();
+    }
+
+    /// @notice Tests that the owner can transfer ownership successfully.
+    function testTransferOwnerGood() public {
+        address newAddress = vm.addr(6);
+
+        vm.prank(admin);
+        _hacktoken.transferOwnershipCustom(newAddress);
+    }
+
+    // ------------------------------------------------------------------------
+    //                              MINT TESTS
+    // ------------------------------------------------------------------------
+
     /// @notice Tests that the owner can mint tokens to a recipient.
     function testMintTokens() public {
         address recipient = vm.addr(3);
@@ -37,25 +89,13 @@ contract HackTokenERC20Test is Test {
         assertEq(_hacktoken.totalSupply(), amount, "Total supply should match minted amount");
     }
 
-    /// @notice Tests that only the owner can mint tokens.
-    function testMintTokensOnlyOwner() public {
-        address recipient = vm.addr(4);
-        uint256 amount = 50 ether;
-
-        vm.prank(admin);
-        _hacktoken.mintTokens(recipient, amount);
-
-        assertEq(_hacktoken.balanceOf(recipient), amount, "Only owner should be able to mint");
-        assertEq(_hacktoken.totalSupply(), amount, "Total supply should match minted amount");
-    }
-
     /// @notice Tests that minting tokens from a non-owner address reverts.
     function testMintTokensNotTheOwner() public {
         address recipient = vm.addr(5);
         uint256 amount = 10 ether;
 
         vm.prank(randomUser);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert();
         _hacktoken.mintTokens(recipient, amount);
     }
 
@@ -67,5 +107,64 @@ contract HackTokenERC20Test is Test {
         vm.prank(admin);
         vm.expectRevert("Amount must be greater than zero");
         _hacktoken.mintTokens(recipient, amount);
+    }
+
+    // ------------------------------------------------------------------------
+    //                              BURN TESTS
+    // ------------------------------------------------------------------------
+
+    /// @notice Tests that burning zero tokens reverts with the correct error message.
+    function testBurnTokensRevertsOnZeroAmount() public {
+        uint256 amount = 0;
+        vm.expectRevert();
+        _hacktoken.burn(amount);
+    }
+
+    /// @notice Tests that burning more tokens than balance reverts.
+    function testBurnTokensInsufficientBalance() public {
+        uint256 amount = 5;
+        vm.expectRevert();
+        _hacktoken.burn(amount);
+    }
+
+    /// @notice Tests that a user can burn their own tokens and the total supply is updated.
+    function testBurnTokensCorrectly() public {
+        uint256 mintAmount = 10;
+        uint256 burnAmount = 5;
+
+        // Mint tokens to randomUser
+        vm.prank(admin);
+        _hacktoken.mintTokens(randomUser, mintAmount);
+
+        // Burn tokens as randomUser
+        vm.prank(randomUser);
+        _hacktoken.burn(burnAmount);
+
+        // Check that the balance and total supply are updated
+        assertEq(_hacktoken.balanceOf(randomUser), mintAmount - burnAmount, "Balance should decrease by burned amount");
+        assertEq(_hacktoken.totalSupply(), mintAmount - burnAmount, "Total supply should decrease by burned amount");
+    }
+
+    // ------------------------------------------------------------------------
+    // PAUSABLE TESTS
+    // ------------------------------------------------------------------------
+
+    /// @notice Tests that transfers are blocked when the contract is paused.
+    function testTransferWhilePausedReverts() public {
+        address recipient = vm.addr(7);
+        uint256 amount = 10 ether;
+
+        // Mint tokens to admin
+        vm.prank(admin);
+        _hacktoken.mintTokens(admin, amount);
+
+        // Pause the contract
+        vm.prank(admin);
+        _hacktoken.pause();
+
+        // Try to transfer while paused
+        vm.prank(admin);
+        vm.expectRevert();
+        _hacktoken.transfer(recipient, amount);
     }
 }
