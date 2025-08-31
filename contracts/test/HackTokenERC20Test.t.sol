@@ -36,9 +36,6 @@ contract HackTokenERC20Test is Test {
 
         vm.prank(admin);
         _hacktoken.mintTokens(recipient, amount);
-
-        assertEq(_hacktoken.balanceOf(recipient), amount, "Only owner should be able to mint");
-        assertEq(_hacktoken.totalSupply(), amount, "Total supply should match minted amount");
     }
 
     /// @notice Tests that only the owner can transfer ownership.
@@ -65,13 +62,16 @@ contract HackTokenERC20Test is Test {
         _hacktoken.unpause();
     }
 
-    /// @notice Tests that the owner can transfer ownership successfully.
-    function testTransferOwnerGood() public {
-        address newAddress = vm.addr(6);
+   /// @notice Tests that minting tokens from a non-owner address reverts.
+    function testMintTokensNotTheOwner() public {
+        address recipient = vm.addr(5);
+        uint256 amount = 10 ether;
 
-        vm.prank(admin);
-        _hacktoken.transferOwnershipCustom(newAddress);
+        vm.prank(randomUser);
+        vm.expectRevert();
+        _hacktoken.mintTokens(recipient, amount);
     }
+
 
     // ------------------------------------------------------------------------
     //                              MINT TESTS
@@ -89,16 +89,6 @@ contract HackTokenERC20Test is Test {
         assertEq(_hacktoken.totalSupply(), amount, "Total supply should match minted amount");
     }
 
-    /// @notice Tests that minting tokens from a non-owner address reverts.
-    function testMintTokensNotTheOwner() public {
-        address recipient = vm.addr(5);
-        uint256 amount = 10 ether;
-
-        vm.prank(randomUser);
-        vm.expectRevert();
-        _hacktoken.mintTokens(recipient, amount);
-    }
-
     /// @notice Tests that minting zero tokens reverts with the correct error message.
     function testMintTokensRevertsOnZeroAmount() public {
         address recipient = vm.addr(6);
@@ -109,23 +99,28 @@ contract HackTokenERC20Test is Test {
         _hacktoken.mintTokens(recipient, amount);
     }
 
+    function testMintTokensRevertsOnZeroAddress() public {
+        vm.prank(admin);
+        vm.expectRevert();
+        _hacktoken.mintTokens(address(0), 13 ether);
+    }
+
+ 
+    // ------------------------------------------------------------------------
+    //                              TRANSFER OWNER TESTS
+    // ------------------------------------------------------------------------
+
+    /// @notice Tests that the owner can transfer ownership successfully.
+    function testTransferOwnerGood() public {
+        address newAddress = vm.addr(6);
+
+        vm.prank(admin);
+        _hacktoken.transferOwnershipCustom(newAddress);
+    }
+
     // ------------------------------------------------------------------------
     //                              BURN TESTS
     // ------------------------------------------------------------------------
-
-    /// @notice Tests that burning zero tokens reverts with the correct error message.
-    function testBurnTokensRevertsOnZeroAmount() public {
-        uint256 amount = 0;
-        vm.expectRevert();
-        _hacktoken.burn(amount);
-    }
-
-    /// @notice Tests that burning more tokens than balance reverts.
-    function testBurnTokensInsufficientBalance() public {
-        uint256 amount = 5;
-        vm.expectRevert();
-        _hacktoken.burn(amount);
-    }
 
     /// @notice Tests that a user can burn their own tokens and the total supply is updated.
     function testBurnTokensCorrectly() public {
@@ -145,26 +140,56 @@ contract HackTokenERC20Test is Test {
         assertEq(_hacktoken.totalSupply(), mintAmount - burnAmount, "Total supply should decrease by burned amount");
     }
 
+    /// @notice Tests that burning zero tokens reverts with the correct error message.
+    function testBurnTokensRevertsOnZeroAmount() public {
+        uint256 amount = 0;
+        vm.expectRevert();
+        _hacktoken.burn(amount);
+    }
+
+    /// @notice Tests that burning more tokens than balance reverts.
+    function testBurnTokensInsufficientBalance() public {
+        uint256 amount = 5;
+        vm.expectRevert();
+        _hacktoken.burn(amount);
+    }
+
+
     // ------------------------------------------------------------------------
     //                            PAUSABLE TESTS
     // ------------------------------------------------------------------------
 
-    // /// @notice Tests that transfers are blocked when the contract is paused.
-    // function testTransferWhilePausedReverts() public {
-    //     address recipient = vm.addr(7);
-    //     uint256 amount = 10 ether;
+    function testPauseCorrectly() public {
+        vm.prank(admin);
+        _hacktoken.pause();
+     }
 
-    //     // Mint tokens to admin
-    //     vm.prank(admin);
-    //     _hacktoken.mintTokens(admin, amount);
+    function testUnPauseCorrectly() public {
+        vm.prank(admin);
+        _hacktoken.pause();
 
-    //     // Pause the contract
-    //     vm.prank(admin);
-    //     _hacktoken.pause();
+        vm.prank(admin);
+        _hacktoken.unpause();
+     }
 
-    //     // Try to transfer while paused
-    //     vm.prank(admin);
-    //     vm.expectRevert();
-    //     _hacktoken.transfer(recipient, amount);
-    // }
+    /// @notice Tests that transfers are blocked when the contract is paused.
+     function testTransferWhilePausedReverts() public {
+         address recipient = vm.addr(7);
+         uint256 amount = 10 ether;
+
+         // Mint tokens to admin
+         vm.prank(admin);
+         _hacktoken.mintTokens(admin, amount);
+
+         // Pause the contract
+         vm.prank(admin);
+         _hacktoken.pause();
+            
+         // Try to transfer while paused
+         vm.prank(admin);
+         vm.expectRevert();
+         _hacktoken.transfer(recipient, amount);
+     }
+
+
 }
