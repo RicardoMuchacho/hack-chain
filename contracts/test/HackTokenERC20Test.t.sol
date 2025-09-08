@@ -122,8 +122,26 @@ contract HackTokenERC20Test is Test {
     //                              BURN TESTS
     // ------------------------------------------------------------------------
 
-    /// @notice Tests that a user can burn their own tokens and the total supply is updated.
-    function testBurnTokensCorrectly() public {
+    /// @notice Tests that only the owner can burn their own tokens and the total supply is updated.
+    function testBurnTokensOnlyOwner() public {
+        uint256 mintAmount = 10;
+        uint256 burnAmount = 5;
+
+        // Mint tokens to admin (owner)
+        vm.prank(admin);
+        _hacktoken.mintTokens(admin, mintAmount);
+
+        // Burn tokens as admin (owner)
+        vm.prank(admin);
+        _hacktoken.burn(burnAmount);
+
+        // Check that the balance and total supply are updated
+        assertEq(_hacktoken.balanceOf(admin), mintAmount - burnAmount, "Owner's balance should decrease by burned amount");
+        assertEq(_hacktoken.totalSupply(), mintAmount - burnAmount, "Total supply should decrease by burned amount");
+    }
+
+    /// @notice Tests that non-owners cannot burn tokens.
+    function testBurnTokensNotOwnerReverts() public {
         uint256 mintAmount = 10;
         uint256 burnAmount = 5;
 
@@ -131,13 +149,10 @@ contract HackTokenERC20Test is Test {
         vm.prank(admin);
         _hacktoken.mintTokens(randomUser, mintAmount);
 
-        // Burn tokens as randomUser
+        // Try to burn as randomUser (should revert)
         vm.prank(randomUser);
+        vm.expectRevert();
         _hacktoken.burn(burnAmount);
-
-        // Check that the balance and total supply are updated
-        assertEq(_hacktoken.balanceOf(randomUser), mintAmount - burnAmount, "Balance should decrease by burned amount");
-        assertEq(_hacktoken.totalSupply(), mintAmount - burnAmount, "Total supply should decrease by burned amount");
     }
 
     /// @notice Tests that burning zero tokens reverts with the correct error message.
